@@ -1,6 +1,6 @@
 ### 技术选型
 | 技术 | 版本|
-| ------ | ---- |
+| :------ | :---- |
 | dubbo | 2.6.5 |
 | dubbo-spring-boot-starter | 0.2.0
 | netty-all | 4.1.22.Final |
@@ -25,6 +25,7 @@ dubbo.provider.version=1.0.0
 dubbo.consumer.version=1.0.0
 ```
 ### 启动运行
+本项目在docker-compose下测试，配置文件[docker-compose.yaml](./docker-compose.yaml)
 ##### 节点规划
 | 技术 | 版本|
 | ------ | ---- |
