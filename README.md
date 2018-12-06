@@ -27,7 +27,7 @@ dubbo.consumer.version=1.0.0
 ### 启动运行
 本项目在docker-compose下测试，配置文件[docker-compose.yaml](./docker-compose.yaml)
 ##### 节点规划
-| 技术 | 版本|
+| service | node |
 | ------ | ---- |
 | dubbo_consumer | 1 |
 | dubbo_provider | 1 |
