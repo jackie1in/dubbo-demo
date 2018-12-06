@@ -1,0 +1,82 @@
+version: '3.1'
+
+services:
+  zoo1:
+    image: zookeeper
+    restart: always
+    hostname: zoo1
+    ports:
+    - 2181:2181
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+
+  zoo2:
+    image: zookeeper
+    restart: always
+    hostname: zoo2
+    expose:
+      - 2181
+    #ports:
+    #- 2182:2181
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zoo3:2888:3888
+
+  zoo3:
+    image: zookeeper
+    restart: always
+    hostname: zoo3
+    expose:
+      - 3306
+    #ports:
+    #- 2183:2181
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=0.0.0.0:2888:3888
+  db:
+    image: mysql:5.6
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    container_name: mysql
+    expose:
+      - 3306
+    environment:
+      # 设置root密码
+      MYSQL_ROOT_PASSWORD: root
+      # root 用户空密码
+      #MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      # 启动时创建数据库
+      MYSQL_DATABASE: world
+      # all can access
+      MYSQL_ROOT_HOST: "%"
+  # php mysql管理页面
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+    - 8000:8080
+  dubbo_provider:
+    image: dubbo_provider:latest
+    hostname: dubbo_provider
+    restart: always
+    container_name: dubbo_provider
+    ports:
+    - 8080:8080
+    environment:
+      - dubbo.registry.client=curator
+      - spring.datasource.url=jdbc:mysql://db:3306/world?autoReconnect=true&failOverReadOnly=false
+      - spring.datasource.password=root
+      - dubbo.registry.address=zoo1:2181,zoo2:2181,zoo3:2181
+      - TZ=Asia/Shanghai
+  dubbo_consumer:
+    image: dubbo_consumer:latest
+    hostname: dubbo_consumer
+    restart: always
+    container_name: dubbo_consumer
+    ports:
+      - 8081:8080
+    environment:
+      - dubbo.registry.client=curator
+      - dubbo.registry.address=zoo1:2181,zoo2:2181,zoo3:2181
+      - TZ=Asia/Shanghai
